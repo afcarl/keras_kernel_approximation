@@ -26,6 +26,11 @@ def model_mk_rff(input_dim, embedding_dim, n_per_set):
         Dimension of the RFF output space (approximation of the RKHS associated to the best kernel)
     n_per_set : int
         number of features per set (Fixed here)
+
+    Returns
+    -------
+    Model
+        The full model (including the Logistic Regression step), but not compiled
     """
     inputs = [Input(shape=(input_dim,)) for _ in range(n_per_set)]
     rffs = [CosineActivation()(Dense(units=embedding_dim)(input_feature)) for input_feature in inputs]
