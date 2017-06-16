@@ -3,7 +3,7 @@ import numpy
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
-def extract_features(X_3d: numpy.ndarray, sz: int, use_time: bool=True):
+def extract_features(X_3d, sz, use_time=True):
     """
     Parameters
     ----------
@@ -41,7 +41,7 @@ def extract_features(X_3d: numpy.ndarray, sz: int, use_time: bool=True):
     return X_ret
 
 
-def ecml17_tiselac_data_preparation(X: numpy.ndarray, d: int=10, feature_sizes: tuple=(8, ), use_time: bool=True):
+def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True):
     """
     Examples
     --------
