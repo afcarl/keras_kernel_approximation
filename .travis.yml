@@ -1,17 +1,32 @@
+sudo: required
+dist: trusty
 language: python
-python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+matrix:
+    include:
+        - python: 2.7
+          env: KERAS_BACKEND=tensorflow TEST_MODE=PEP8
+        - python: 2.7
+          env: KERAS_BACKEND=tensorflow TEST_MODE=INTEGRATION_TESTS
+        - python: 3.5
+          env: KERAS_BACKEND=tensorflow TEST_MODE=DOC
+        - python: 2.7
+          env: KERAS_BACKEND=tensorflow
+        - python: 3.5
+          env: KERAS_BACKEND=tensorflow
+        - python: 2.7
+          env: KERAS_BACKEND=theano
+        - python: 3.5
+          env: KERAS_BACKEND=theano
+        - python: 2.7
+          env: KERAS_BACKEND=cntk
+        - python: 3.5
+          env: KERAS_BACKEND=cntk
 install:
-  - sudo apt-get update
+  # code below is taken from http://conda.pydata.org/docs/travis.html
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
     else
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     fi
@@ -20,9 +35,40 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
+  # Useful for debugging any issues with conda
   - conda info -a
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy scikit-learn tensorflow keras nose
+
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib pandas pytest h5py
   - source activate test-environment
+  - pip install theano
+
+  # install PIL for preprocessing tests
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      conda install pil;
+    elif [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then
+      conda install Pillow;
+    fi
+
+  - pip install -e .[tests]
+
+  # install TensorFlow (CPU version).
+  - pip install tensorflow
+  
+  # install cntk
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      pip install https://cntk.ai/PythonWheel/CPU-Only/cntk-2.0-cp27-cp27mu-linux_x86_64.whl;
+    elif [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then
+      pip install https://cntk.ai/PythonWheel/CPU-Only/cntk-2.0-cp35-cp35m-linux_x86_64.whl;
+    fi
+
+  #install open mpi
+  - rm -rf ~/mpi
+  - mkdir ~/mpi
+  - pushd ~/mpi
+  - wget http://cntk.ai/PythonWheel/ForKeras/depends/openmpi_1.10-3.zip
+  - unzip ./openmpi_1.10-3.zip
+  - sudo dpkg -i openmpi_1.10-3.deb
+  - popd
 script: nosetests --with-doctest
 notifications:
   email: false
