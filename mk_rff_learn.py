@@ -31,7 +31,14 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes):
     for d in sorted(input_dimensions.keys()):
         n_features = input_dimensions[d]
         inputs.extend([Input(shape=(d, )) for _ in range(n_features)])
-    if len(input_dimensions) > 1:
+    if sum(input_dimensions.values()) > 1:
+        rff_layer = RFFLayer(units=embedding_dim)
+        concatenated_avg_rffs = rff_layer(inputs[0])
+    elif len(input_dimensions) == 1:
+        rff_layer = RFFLayer(units=embedding_dim)
+        rffs = [rff_layer(input_feature) for input_feature in inputs]
+        concatenated_avg_rffs = average(rffs)
+    else:
         avg_rffs = []
         idx0 = 0
         rff_layers = {}
@@ -44,10 +51,6 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes):
             avg_rffs.append(average(rffs))
             idx0 += n_features
         concatenated_avg_rffs = concatenate(avg_rffs)
-    else:
-        rff_layer = RFFLayer(units=embedding_dim)
-        rffs = [rff_layer(input_feature) for input_feature in inputs]
-        concatenated_avg_rffs = average(rffs)
     predictions = Dense(units=n_classes, activation="softmax")(concatenated_avg_rffs)
 
     return Model(inputs=inputs, outputs=predictions)
