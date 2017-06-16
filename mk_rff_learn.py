@@ -1,17 +1,11 @@
 from keras.models import Model
 from keras.layers import Dense, Input, Average
-from keras import backend as K
-from keras.engine.topology import Layer
 from sklearn.datasets import make_circles
 import numpy
 
+from layers import CosineActivatedDenseLayer
+
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
-
-
-class CosineActivation(Layer):
-    """Cosine Activation Layer that is necessary to mimic the RFF extraction step."""
-    def call(self, x, **kwargs):
-        return K.cos(x)
 
 
 def model_mk_rff(input_dim, embedding_dim, n_per_set):
@@ -33,7 +27,8 @@ def model_mk_rff(input_dim, embedding_dim, n_per_set):
         The full model (including the Logistic Regression step), but not compiled
     """
     inputs = [Input(shape=(input_dim,)) for _ in range(n_per_set)]
-    rffs = [CosineActivation()(Dense(units=embedding_dim)(input_feature)) for input_feature in inputs]
+    rff_layer = CosineActivatedDenseLayer(units=embedding_dim)
+    rffs = [rff_layer(input_feature) for input_feature in inputs]
     avg_rff = Average()(rffs)
     predictions = Dense(units=n_classes, activation="softmax")(avg_rff)
 
@@ -60,11 +55,14 @@ if __name__ == "__main__":
 
     # Model
     model = model_mk_rff(input_dim=d, embedding_dim=embedding_dim, n_per_set=n_per_set)
-    model.compile(loss="categorical_crossentropy", optimizer="sgd")
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
 
     # Fit & predict
-    model.fit(sets, y_encoded, batch_size=128, epochs=500, verbose=1)
+    model.fit(sets, y_encoded, batch_size=128, epochs=50, verbose=1)
     y_pred = model.predict(sets, verbose=False)
     print(numpy.sum(y_pred.argmax(axis=1) == y_encoded.argmax(axis=1)) / n_sets)
+
+    # Just check that weights are shared, not repeated as many times as the number of features in the sets
+    print("Weights:", [w.shape for w in model.get_weights()])
 
     del model
