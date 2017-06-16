@@ -28,6 +28,10 @@ dict_dims = {(d * f_sz + 1): sz - f_sz + 1 for f_sz in feature_sizes}
 model = model_mk_rff(input_dimensions=dict_dims, embedding_dim=rff_dim, n_classes=n_classes)
 model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
 
+# Just check that weights are shared, not repeated as many times as the number of features in the sets
+print("Weights:", [w.shape for w in model.get_weights()])
+print("Total number of parameters:", model.count_params())
+
 # Go!
 model.fit(feats_8_12_16, y_encoded, batch_size=128, epochs=50, verbose=1)
 y_pred = model.predict(feats_8_12_16, verbose=False)
