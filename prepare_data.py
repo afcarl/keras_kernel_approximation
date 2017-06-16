@@ -3,7 +3,7 @@ import numpy
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
-def extract_features(X_3d: numpy.ndarray, sz: int, use_time=True):
+def extract_features(X_3d: numpy.ndarray, sz: int, use_time: bool=True):
     """
     Parameters
     ----------
@@ -16,7 +16,7 @@ def extract_features(X_3d: numpy.ndarray, sz: int, use_time=True):
 
     Returns
     -------
-    list of (sz_ts - sz + 1) arrays of shape (n_ts, sz * d) or (n_ts, sz * d + 1) if use_time=True
+    list of (sz_ts - sz + 1) arrays of shape (n_ts, sz * d) if use_time=False or (n_ts, sz * d + 1) if use_time=True
         List of transformed arrays. For each time step, if use_time=True, time information is appended at the end of
         the feature vector.
 
@@ -41,7 +41,7 @@ def extract_features(X_3d: numpy.ndarray, sz: int, use_time=True):
     return X_ret
 
 
-def ecml17_tiselac_data_preparation(X: numpy.ndarray, d=10, feature_sizes=(8, ), use_time=True):
+def ecml17_tiselac_data_preparation(X: numpy.ndarray, d: int=10, feature_sizes: tuple=(8, ), use_time: bool=True):
     """
     Examples
     --------
