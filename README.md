@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/rtavenar/keras_kernel_approximation.svg?branch=master)](https://travis-ci.org/rtavenar/keras_kernel_approximation)
+[![Code Climate](https://codeclimate.com/github/rtavenar/keras_kernel_approximation/badges/gpa.svg)](https://codeclimate.com/github/rtavenar/keras_kernel_approximation)
 
 # Learning kernel approximation parameters using `keras`
 
