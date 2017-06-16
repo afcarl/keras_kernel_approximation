@@ -42,15 +42,6 @@ install:
   - source activate test-environment
   - pip install theano
 
-  # install PIL for preprocessing tests
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      conda install pil;
-    elif [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then
-      conda install Pillow;
-    fi
-
-  - pip install -e .[tests]
-
   # install TensorFlow (CPU version).
   - pip install tensorflow
   
