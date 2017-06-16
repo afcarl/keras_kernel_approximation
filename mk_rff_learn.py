@@ -26,6 +26,12 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes):
     -------
     Model
         The full model (including the Logistic Regression step), but not compiled
+        
+    Examples
+    --------
+    >>> m = model_mk_rff(input_dimensions={2: 5}, embedding_dim=10, n_classes=2)
+    >>> m.count_params()
+    52
     """
     inputs = []
     for d in sorted(input_dimensions.keys()):
