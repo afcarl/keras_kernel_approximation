@@ -1,5 +1,6 @@
 import numpy
 from keras.utils import to_categorical
+from keras.metrics import categorical_accuracy
 
 from mk_rff_learn import model_mk_rff
 from prepare_data import ecml17_tiselac_data_preparation
@@ -31,4 +32,4 @@ model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
 # Go!
 model.fit(feats_8_12_16, y_encoded, batch_size=128, epochs=50, verbose=1)
 y_pred = model.predict(feats_8_12_16, verbose=False)
-print(numpy.sum(y_pred.argmax(axis=1) == y_encoded.argmax(axis=1)) / n_ts)
+print(categorical_accuracy(y_encoded, y_pred))	

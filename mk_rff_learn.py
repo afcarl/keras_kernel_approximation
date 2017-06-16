@@ -1,6 +1,7 @@
 from keras.models import Model
 from keras.layers import Dense, Input
 from keras.layers.merge import average, concatenate
+from keras.metrics import categorical_accuracy
 from sklearn.datasets import make_circles
 import numpy
 
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     # Fit & predict
     model.fit(sets, y_encoded, batch_size=128, epochs=50, verbose=1)
     y_pred = model.predict(sets, verbose=False)
-    print(numpy.sum(y_pred.argmax(axis=1) == y_encoded.argmax(axis=1)) / n_sets)
+    print(categorical_accuracy(y_encoded, y_pred))
 
     # Just check that weights are shared, not repeated as many times as the number of features in the sets
     print("Weights:", [w.shape for w in model.get_weights()])
