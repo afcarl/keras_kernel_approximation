@@ -31,7 +31,7 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes):
     for d in sorted(input_dimensions.keys()):
         n_features = input_dimensions[d]
         inputs.extend([Input(shape=(d, )) for _ in range(n_features)])
-    if sum(input_dimensions.values()) > 1:
+    if len(inputs) == 1:
         rff_layer = RFFLayer(units=embedding_dim)
         concatenated_avg_rffs = rff_layer(inputs[0])
     elif len(input_dimensions) == 1:
