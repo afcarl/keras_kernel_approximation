@@ -17,10 +17,6 @@ matrix:
           env: KERAS_BACKEND=theano
         - python: 3.5
           env: KERAS_BACKEND=theano
-        - python: 2.7
-          env: KERAS_BACKEND=cntk
-        - python: 3.5
-          env: KERAS_BACKEND=cntk
 install:
   # code below is taken from http://conda.pydata.org/docs/travis.html
   # We do this conditionally because it saves us some downloading if the
@@ -38,19 +34,13 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy scikit-learn nose
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy
   - source activate test-environment
+  - pip install scikit-learn
+  - pip install nose
   - pip install theano
-
-  # install TensorFlow (CPU version).
   - pip install tensorflow
-  
-  # install cntk
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      pip install https://cntk.ai/PythonWheel/CPU-Only/cntk-2.0-cp27-cp27mu-linux_x86_64.whl;
-    elif [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then
-      pip install https://cntk.ai/PythonWheel/CPU-Only/cntk-2.0-cp35-cp35m-linux_x86_64.whl;
-    fi
+  - pip install keras
 
   #install open mpi
   - rm -rf ~/mpi
