@@ -3,14 +3,14 @@ from keras.layers import Dense
 from sklearn.datasets import make_circles
 import numpy
 
-from layers import CosineActivatedDenseLayer
+from layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
 def model_rff(input_dim, embedding_dim, n_classes):
     model = Sequential()
-    model.add(CosineActivatedDenseLayer(units=embedding_dim, input_dim=input_dim))
+    model.add(RFFLayer(units=embedding_dim, input_dim=input_dim))
     model.add(Dense(units=n_classes, activation="softmax"))
     return model
 

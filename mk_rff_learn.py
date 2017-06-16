@@ -3,7 +3,7 @@ from keras.layers import Dense, Input, Average
 from sklearn.datasets import make_circles
 import numpy
 
-from layers import CosineActivatedDenseLayer
+from layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -27,7 +27,7 @@ def model_mk_rff(input_dim, embedding_dim, n_per_set):
         The full model (including the Logistic Regression step), but not compiled
     """
     inputs = [Input(shape=(input_dim,)) for _ in range(n_per_set)]
-    rff_layer = CosineActivatedDenseLayer(units=embedding_dim)
+    rff_layer = RFFLayer(units=embedding_dim)
     rffs = [rff_layer(input_feature) for input_feature in inputs]
     avg_rff = Average()(rffs)
     predictions = Dense(units=n_classes, activation="softmax")(avg_rff)

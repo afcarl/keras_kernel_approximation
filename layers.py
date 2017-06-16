@@ -48,3 +48,5 @@ class CosineActivatedDenseLayer(Dense):
         }
         base_config = super(Dense, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
+
+RFFLayer = CosineActivatedDenseLayer  # If you prefer
