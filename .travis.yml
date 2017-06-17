@@ -4,11 +4,7 @@ language: python
 matrix:
     include:
         - python: 2.7
-          env: KERAS_BACKEND=tensorflow TEST_MODE=PEP8
-        - python: 2.7
-          env: KERAS_BACKEND=tensorflow TEST_MODE=INTEGRATION_TESTS
-        - python: 3.5
-          env: KERAS_BACKEND=tensorflow TEST_MODE=DOC
+          env: KERAS_BACKEND=theano TEST_MODE=PEP8
         - python: 2.7
           env: KERAS_BACKEND=tensorflow
         - python: 3.5
@@ -36,20 +32,12 @@ install:
 
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy
   - source activate test-environment
+  - pip install pep8 pytest-pep8
+  - pip install theano
+  - pip install git+git://github.com/fchollet/keras.git
+  - pip install tensorflow
   - pip install scikit-learn
   - pip install nose
-  - pip install theano
-  - pip install tensorflow
-  - pip install keras
-
-  #install open mpi
-  - rm -rf ~/mpi
-  - mkdir ~/mpi
-  - pushd ~/mpi
-  - wget http://cntk.ai/PythonWheel/ForKeras/depends/openmpi_1.10-3.zip
-  - unzip ./openmpi_1.10-3.zip
-  - sudo dpkg -i openmpi_1.10-3.deb
-  - popd
 script: nosetests --with-doctest
 notifications:
   email: false
