@@ -1,6 +1,7 @@
 from keras.models import Model
 from keras.layers import Dense, Input
 from keras.layers.merge import average, concatenate
+from keras.metrics import categorical_accuracy
 from sklearn.datasets import make_circles
 import numpy
 
@@ -73,12 +74,11 @@ if __name__ == "__main__":
 
     # Model
     model = model_mk_rff(input_dimensions={d: n_per_set}, embedding_dim=embedding_dim, n_classes=n_classes)
-    model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=[categorical_accuracy])
 
     # Fit & predict
-    model.fit(sets, y_encoded, batch_size=128, epochs=50, verbose=1)
-    y_pred = model.predict(sets, verbose=False)
-    print(numpy.sum(y_pred.argmax(axis=1) == y_encoded.argmax(axis=1)) / n_sets)
+    model.fit(sets, y_encoded, batch_size=128, epochs=50, verbose=True)
+    print("Correct classification rate: ", model.evaluate(sets, y_encoded, verbose=False)[1])
 
     # Just check that weights are shared, not repeated as many times as the number of features in the sets
     print("Weights:", [w.shape for w in model.get_weights()])
