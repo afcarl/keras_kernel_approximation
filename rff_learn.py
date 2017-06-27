@@ -1,10 +1,10 @@
 from keras.models import Sequential
 from keras.layers import Dense
-from keras.metrics import categorical_accuracy
 from sklearn.datasets import make_circles
 import numpy
 
 from layers import RFFLayer
+from metrics import f1_score
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -29,10 +29,13 @@ if __name__ == "__main__":
 
     # Model
     model = model_rff(input_dim=d, embedding_dim=embedding_dim, n_classes=n_classes)
-    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=[categorical_accuracy])
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy", f1_score])
 
     # Fit & predict
     model.fit(X, y_encoded, batch_size=128, epochs=50, verbose=True)
-    print("Correct classification rate: ", model.evaluate(X, y_encoded, verbose=False)[1])
+
+    eval_model = model.evaluate(X, y_encoded, verbose=False)
+    print("Correct classification rate:", eval_model[1])
+    print("F1-score:", eval_model[2])
 
     del model
