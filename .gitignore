@@ -97,3 +97,5 @@ ENV/
 
 # Own stuff
 .idea/
+models/
+data_tiselac/
