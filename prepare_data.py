@@ -3,7 +3,7 @@ import numpy
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
-def extract_features(X_3d, sz, use_time=True):
+def extract_features(X_3d, sz, use_time=True, make_monodim=True):
     """
     Parameters
     ----------
@@ -28,6 +28,8 @@ def extract_features(X_3d, sz, use_time=True):
     >>> [f.shape for f in extract_features(X, sz=14, use_time=True)]
     [(10, 43), (10, 43)]
     """
+    if not make_monodim:
+        return extract_features_multidim(X_3d, sz)
     n_ts, sz_ts, d = X_3d.shape
     if use_time:
         shape_ret = (n_ts, sz * d + 1)
@@ -41,7 +43,32 @@ def extract_features(X_3d, sz, use_time=True):
     return X_ret
 
 
-def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True):
+def extract_features_multidim(X_3d, sz):
+    """
+    Parameters
+    ----------
+    X_3d : array-like of shape (n_ts, sz_ts, d)
+        Input data.
+    sz : int
+        Size (number of time steps) of feature window.
+    use_time : bool, default: True
+        Whether a last dimension corresponding to time should be appended to the features
+
+    Returns
+    -------
+    list of (sz_ts - sz + 1) arrays of shape (n_ts, sz * d) if use_time=False or (n_ts, sz * d + 1) if use_time=True
+        List of transformed arrays. For each time step, if use_time=True, time information is appended at the end of
+        the feature vector.
+    """
+    n_ts, sz_ts, d = X_3d.shape
+    shape_ret = (n_ts, sz, d)
+    X_ret = [numpy.zeros(shape_ret) for _ in range(sz_ts - sz + 1)]
+    for t in range(sz_ts - sz + 1):
+        X_ret[t] = X_3d[:, t:t+sz, :]
+    return X_ret
+
+
+def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True, make_monodim=True):
     """
     Examples
     --------
@@ -62,5 +89,5 @@ def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True)
     X_ = X.reshape((X.shape[0], -1, d))
     prepared_data = []
     for sz in list(feature_sizes):
-        prepared_data.extend(extract_features(X_, sz, use_time=use_time))
+        prepared_data.extend(extract_features(X_, sz, use_time=use_time, make_monodim=make_monodim))
     return prepared_data

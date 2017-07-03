@@ -61,7 +61,7 @@ def model_mlp_mk_rff(input_dimensions, embedding_dim, hidden_classification_laye
         concatenated_avg_rffs = concatenate(avg_rffs)
     hidden_layers = [concatenated_avg_rffs]
     for n_units in hidden_classification_layers:
-        hidden_layers.append(Dense(units=n_units, activation="sigmoid")(hidden_layers[-1]))
+        hidden_layers.append(Dense(units=n_units, activation="tanh")(hidden_layers[-1]))
     predictions = Dense(units=n_classes, activation="softmax")(hidden_layers[-1])
 
     return Model(inputs=inputs, outputs=predictions)
