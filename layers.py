@@ -36,7 +36,7 @@ class CosineActivatedDenseLayer(Dense):
     def get_config(self):
         config = {
             'units': self.units,
-            'activation': 'cosine',
+            'activation': K.cos,
             'use_bias': self.use_bias,
             'kernel_initializer': initializers.serialize(self.kernel_initializer),
             'bias_initializer': initializers.serialize(self.bias_initializer),

@@ -4,7 +4,6 @@ from sklearn.datasets import make_circles
 import numpy
 
 from layers import RFFLayer
-from metrics import f1_score
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -29,13 +28,12 @@ if __name__ == "__main__":
 
     # Model
     model = model_rff(input_dim=d, embedding_dim=embedding_dim, n_classes=n_classes)
-    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy", f1_score])
+    model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
 
     # Fit & predict
     model.fit(X, y_encoded, batch_size=128, epochs=50, verbose=True)
 
     eval_model = model.evaluate(X, y_encoded, verbose=False)
     print("Correct classification rate:", eval_model[1])
-    print("F1-score:", eval_model[2])
 
     del model

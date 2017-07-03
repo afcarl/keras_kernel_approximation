@@ -18,7 +18,7 @@ def shuffle_data(X, y):
 d = 10
 sz = 23
 n_classes = 9
-rff_dim = 256
+rff_dim = 512
 feature_sizes = [8, 12, 16]
 
 # Load training data
@@ -42,8 +42,9 @@ print("Weights:", [w.shape for w in model.get_weights()])
 print("Total number of parameters:", model.count_params())
 
 # Go!
-save_model_cb = ModelCheckpoint("models/model_mk_rff.{epoch:03d}-{val_loss:.2f}.hdf5", monitor='val_loss',
-                                verbose=False, save_best_only=True, save_weights_only=False, mode='auto', period=10)
+save_model_cb = ModelCheckpoint("models/model_mk_rff." + str(rff_dim) + ".{epoch:03d}-{val_loss:.2f}.weights.hdf5",
+                                monitor='val_loss', verbose=False, save_best_only=True, save_weights_only=True,
+                                mode='auto', period=10)
 early_stopping_cb = EarlyStopping(monitor='val_loss', min_delta=0, patience=100, verbose=True, mode='auto')
 model.fit(feats_8_12_16, y_encoded, batch_size=128, epochs=10 * 1000, verbose=2, validation_split=0.05,
           callbacks=[save_model_cb, early_stopping_cb])
