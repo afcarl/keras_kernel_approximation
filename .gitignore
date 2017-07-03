@@ -98,4 +98,6 @@ ENV/
 # Own stuff
 .idea/
 models/
+models_mlp/
 data_tiselac/
+pred/
