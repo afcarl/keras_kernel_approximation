@@ -99,5 +99,7 @@ ENV/
 .idea/
 models/
 models_mlp/
+models_rnn/
+models_baseline/
 data_tiselac/
 pred/
