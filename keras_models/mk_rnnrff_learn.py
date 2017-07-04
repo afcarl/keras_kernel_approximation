@@ -1,8 +1,8 @@
-from keras.models import Model
 from keras.layers import Dense, Input, SimpleRNN
 from keras.layers.merge import average, concatenate
+from keras.models import Model
 
-from layers import RFFLayer
+from utils.layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 

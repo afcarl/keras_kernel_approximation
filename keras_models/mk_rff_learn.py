@@ -1,15 +1,15 @@
-from keras.models import Model
+import numpy
 from keras.layers import Dense, Input
 from keras.layers.merge import average, concatenate
+from keras.models import Model
 from sklearn.datasets import make_circles
-import numpy
 
-from layers import RFFLayer
+from utils.layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
-def model_mk_rff(input_dimensions, embedding_dim, n_classes):
+def model_mk_rff(input_dimensions, embedding_dim, n_classes, side_info_dim=0):
     """Build a match kernel-like model that computes the average of RFF feature for a set and then classifies it using
     Logistic Regression (since the embedding space is supposed to be a good place for linear separability of the sets).
 
@@ -57,7 +57,13 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes):
             avg_rffs.append(average(rffs))
             idx0 += n_features
         concatenated_avg_rffs = concatenate(avg_rffs)
-    predictions = Dense(units=n_classes, activation="softmax")(concatenated_avg_rffs)
+    if side_info_dim > 0:
+        side_info_input = Input(shape=(side_info_dim, ))
+        concatenated_pred_input = concatenate([concatenated_avg_rffs, side_info_input])
+        inputs.append(side_info_input)
+    else:
+        concatenated_pred_input = concatenated_avg_rffs
+    predictions = Dense(units=n_classes, activation="softmax")(concatenated_pred_input)
 
     return Model(inputs=inputs, outputs=predictions)
 

@@ -97,9 +97,5 @@ ENV/
 
 # Own stuff
 .idea/
-models/
-models_mlp/
-models_rnn/
-models_baseline/
+output/
 data_tiselac/
-pred/

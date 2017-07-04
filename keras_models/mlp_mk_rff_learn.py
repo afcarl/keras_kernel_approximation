@@ -1,10 +1,8 @@
-from keras.models import Model
 from keras.layers import Dense, Input
 from keras.layers.merge import average, concatenate
-from sklearn.datasets import make_circles
-import numpy
+from keras.models import Model
 
-from layers import RFFLayer
+from utils.layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 

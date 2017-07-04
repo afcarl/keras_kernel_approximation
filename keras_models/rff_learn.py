@@ -1,9 +1,9 @@
-from keras.models import Sequential
-from keras.layers import Dense
-from sklearn.datasets import make_circles
 import numpy
+from keras.layers import Dense
+from keras.models import Sequential
+from sklearn.datasets import make_circles
 
-from layers import RFFLayer
+from utils.layers import RFFLayer
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 

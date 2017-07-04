@@ -1,10 +1,10 @@
 import numpy
-from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.utils import to_categorical
 
-from mk_rnnrff_learn import model_mk_rnnrff
-from prepare_data import ecml17_tiselac_data_preparation
-from metrics import f1_score
+from keras_models.mlp_mk_rff_learn import model_mlp_mk_rff
+from utils.metrics import f1_score
+from utils.prepare_data import ecml17_tiselac_data_preparation
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -18,9 +18,9 @@ def shuffle_data(X, y):
 d = 10
 sz = 23
 n_classes = 9
-rff_dim = 256
-rnn_dim = 32
 feature_sizes = [8, 12, 16]
+rff_dim = 512
+hidden_layers = [256]
 
 # Load training data
 X = numpy.loadtxt("data_tiselac/training.txt", dtype=numpy.float, delimiter=",")
@@ -31,11 +31,12 @@ y = numpy.loadtxt("data_tiselac/training_class.txt", delimiter=",").astype(numpy
 # Prepare data
 X, y = shuffle_data(X, y)
 y_encoded = to_categorical(y)
-feats_8_12_16 = ecml17_tiselac_data_preparation(X, d=d, feature_sizes=tuple(feature_sizes), make_monodim=False)
+feats_8_12_16 = ecml17_tiselac_data_preparation(X, d=d, feature_sizes=tuple(feature_sizes), use_time=True)
 
 # Prepare model
-dict_dims = {(f_sz, d): sz - f_sz + 1 for f_sz in feature_sizes}
-model = model_mk_rnnrff(input_dimensions=dict_dims, rnn_dim=rnn_dim, rff_dim=rff_dim, n_classes=n_classes)
+dict_dims = {(d * f_sz + 1): sz - f_sz + 1 for f_sz in feature_sizes}
+model = model_mlp_mk_rff(input_dimensions=dict_dims, embedding_dim=rff_dim, hidden_classification_layers=hidden_layers,
+                         n_classes=n_classes)
 model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy"])  #, f1_score])
 
 # Just check that weights are shared, not repeated as many times as the number of features in the sets
@@ -43,13 +44,13 @@ print("Weights:", [w.shape for w in model.get_weights()])
 print("Total number of parameters:", model.count_params())
 
 # Go!
-save_model_cb = ModelCheckpoint("models_rnn/model_mk_rnnrff." + str(rnn_dim) + "." + str(rff_dim) +
-                                ".{epoch:03d}-{val_loss:.2f}.weights.hdf5", monitor='val_loss', verbose=False,
-                                save_best_only=True, save_weights_only=True, mode='auto', period=1)
+save_model_cb = ModelCheckpoint("models_mlp/model_mk_rff." + str(rff_dim) + ".{epoch:03d}-{val_loss:.2f}.weights.hdf5",
+                                monitor='val_loss', verbose=False, save_best_only=True, save_weights_only=True,
+                                mode='auto', period=1)
 early_stopping_cb = EarlyStopping(monitor='val_loss', min_delta=0, patience=100, verbose=True, mode='auto')
 model.fit(feats_8_12_16, y_encoded, batch_size=128, epochs=10 * 1000, verbose=2, validation_split=0.05,
           callbacks=[save_model_cb, early_stopping_cb])
-model.save_weights("models_rnn/model_mk_rnnrff.%d.%d.final.weights.hdf5" % (rnn_dim, rff_dim))
+model.save_weights("models_mlp/model_mk_rff.%d.final.weights.hdf5" % rff_dim)
 y_pred = model.predict(feats_8_12_16, verbose=False)
 eval_model = model.evaluate(feats_8_12_16, y_encoded, verbose=False)
 print("Correct classification rate:", eval_model[1])

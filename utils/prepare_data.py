@@ -1,4 +1,5 @@
 import numpy
+from keras.utils import to_categorical
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -91,3 +92,33 @@ def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True,
     for sz in list(feature_sizes):
         prepared_data.extend(extract_features(X_, sz, use_time=use_time, make_monodim=make_monodim))
     return prepared_data
+
+
+def load_tiselac(training_set=True, shuffle=False, random_state=None):
+    if training_set:
+        X = numpy.loadtxt("data_tiselac/training.txt", dtype=numpy.float, delimiter=",")
+        X /= X.max()
+        X_coord = numpy.loadtxt("data_tiselac/coord_training.txt", dtype=numpy.float, delimiter=",")
+        X_coord /= X_coord.max(axis=0)
+        y = numpy.loadtxt("data_tiselac/training_class.txt", delimiter=",").astype(numpy.int) - 1
+        y = to_categorical(y)
+        if shuffle:
+            X, X_coord, y = shuffle_data(X, X_coord, y, random_state=random_state)
+        return X, X_coord, y
+    else:
+        X = numpy.loadtxt("data_tiselac/test.txt", dtype=numpy.float, delimiter=",")
+        X /= X.max()
+        X_coord = numpy.loadtxt("data_tiselac/coord_test.txt", dtype=numpy.float, delimiter=",")
+        X_coord /= X_coord.max(axis=0)
+        return shuffle_data(X, X_coord)
+
+
+def shuffle_data(*args, **kwargs):
+    rs = kwargs.get("random_state", None)
+    if not isinstance(rs, numpy.random.RandomState):
+        rs = numpy.random.RandomState(rs)
+    assert len(args) > 0
+    for X in args[1:]:
+        assert X.shape[0] == args[0].shape[0]
+    indices = rs.permutation(args[0].shape[0])
+    return [X[indices] for X in args]
