@@ -30,7 +30,9 @@ basename = "output/models_rff/"
 for sz in feature_sizes:
     basename += "%d-" % sz
 basename = basename[:-1] + ".%d" % rff_dim
-model_fit_and_save(model, basename, X=feats_8_12_16 + [X_coord], y=y)
+list_callbacks = model_fit_and_save(model, basename, X=feats_8_12_16 + [X_coord], y=y)
 
 # Go!
+print("Best model performance (full training set")
+model.load_weights(list_callbacks[0].last_saved_model)
 print_eval(model, feats_8_12_16 + [X_coord], y)
