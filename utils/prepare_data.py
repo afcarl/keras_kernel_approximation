@@ -106,11 +106,15 @@ def load_tiselac(training_set=True, shuffle=False, random_state=None):
             X, X_coord, y = shuffle_data(X, X_coord, y, random_state=random_state)
         return X, X_coord, y
     else:
+        X_train = numpy.loadtxt("data_tiselac/training.txt", dtype=numpy.float, delimiter=",")
         X = numpy.loadtxt("data_tiselac/test.txt", dtype=numpy.float, delimiter=",")
-        X /= X.max()
+        X /= X_train.max()
+        X_train_coord = numpy.loadtxt("data_tiselac/coord_test.txt", dtype=numpy.float, delimiter=",")
         X_coord = numpy.loadtxt("data_tiselac/coord_test.txt", dtype=numpy.float, delimiter=",")
-        X_coord /= X_coord.max(axis=0)
-        return shuffle_data(X, X_coord)
+        X_coord /= X_train_coord.max(axis=0)
+        if shuffle:
+            X, X_coord = shuffle_data(X, X_coord, random_state=random_state)
+        return X, X_coord
 
 
 def shuffle_data(*args, **kwargs):

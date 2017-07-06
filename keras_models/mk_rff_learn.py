@@ -9,7 +9,7 @@ from utils.layers import RFFLayer
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
 
-def model_mk_rff(input_dimensions, embedding_dim, n_classes, side_info_dim=0):
+def model_mk_rff(input_dimensions, embedding_dim, n_classes, side_info_dim=0, softmax_layer=True):
     """Build a match kernel-like model that computes the average of RFF feature for a set and then classifies it using
     Logistic Regression (since the embedding space is supposed to be a good place for linear separability of the sets).
 
@@ -63,8 +63,10 @@ def model_mk_rff(input_dimensions, embedding_dim, n_classes, side_info_dim=0):
         inputs.append(side_info_input)
     else:
         concatenated_pred_input = concatenated_avg_rffs
-    predictions = Dense(units=n_classes, activation="softmax")(concatenated_pred_input)
-
+    if softmax_layer:
+        predictions = Dense(units=n_classes, activation="softmax")(concatenated_pred_input)
+    else:
+        predictions = concatenated_pred_input
     return Model(inputs=inputs, outputs=predictions)
 
 
