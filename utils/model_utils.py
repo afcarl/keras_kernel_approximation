@@ -51,7 +51,7 @@ def print_train_valid(model, X, y, validation_split):
         print_eval(model=model, X=X_valid, y=y_valid)
 
 
-def load_model(fname_model, sz, d, d_side_info=None, use_lstm=True, n_classes=None):
+def load_model(fname_model, sz, d, d_side_info=0, use_lstm=True, n_classes=None):
     """Loads a model from its weight filename (all necessary information should be included in it).
 
     As for now, this function assumes that default activation function is used for each layer.
@@ -77,7 +77,7 @@ def load_model(fname_model, sz, d, d_side_info=None, use_lstm=True, n_classes=No
         n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
         rff_dim = n_units_hidden_layers[-1]
         n_units_hidden_layers.pop()
-        model = model_mlp_rff(input_shape=(sz * d + d_side_info), hidden_layers=n_units_hidden_layers,
+        model = model_mlp_rff(input_shape=(sz * d + d_side_info, ), hidden_layers=n_units_hidden_layers,
                               rff_layer_dim=rff_dim, n_classes=n_classes)
     else:
         raise ValueError("Cannot interpret file name %s" % basename)
