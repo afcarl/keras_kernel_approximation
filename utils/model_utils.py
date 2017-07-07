@@ -2,6 +2,7 @@ from keras.callbacks import ModelCheckpoint, EarlyStopping
 import os
 
 from utils.metrics import f1_score
+from keras_models.model_zoo import model_mlp, model_mlp_rff, model_rnn
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -44,6 +45,41 @@ def print_train_valid(model, X, y, validation_split):
         else:
             print("Validation set")
         print_eval(model=model, X=X_valid, y=y_valid)
+
+
+def load_model(fname_model, input_shape, input_shape_side_info=None, use_lstm=True, n_classes=None):
+    """Loads a model from its weight filename (all necessary information should be included in it).
+
+    As for now, this function assumes that default activation function is used for each layer.
+    """
+    path, basename = os.path.split(fname_model)
+    model = None
+    if basename.startswith("mlp."):
+        # MLP model
+        s_layer_sizes = basename.split(".")[1]
+        n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
+        model = model_mlp(input_shape=input_shape, hidden_layers=n_units_hidden_layers, n_classes=n_classes)
+    elif basename.startswith("rnn."):
+        # RNN model
+        s_rnn_dim, s_layer_sizes = basename.split(".")[1:3]
+        dim_rnn = int(s_rnn_dim)
+        n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
+        model = model_rnn(input_shape=input_shape, hidden_layers=n_units_hidden_layers, rnn_layer_dim=dim_rnn,
+                          input_shape_side_info=input_shape_side_info, n_classes=n_classes, use_lstm=use_lstm)
+    elif basename.startswith("mlp_rff."):
+        # MLP-RFF model
+        s_layer_sizes = basename.split(".")[1]
+        n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
+        rff_dim = n_units_hidden_layers[-1]
+        n_units_hidden_layers.pop()
+        model = model_mlp_rff(input_shape=input_shape, hidden_layers=n_units_hidden_layers, rff_layer_dim=rff_dim,
+                              n_classes=n_classes)
+    else:
+        raise ValueError("Cannot interpret file name %s" % basename)
+    if model is not None:
+        model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
+        model.load_weights(fname_model, by_name=True)
+        return model
 
 
 class CustomModelCheckpoint(ModelCheckpoint):

@@ -1,8 +1,8 @@
 import numpy
 
-from utils.model_utils import model_fit_and_save, print_eval
-from utils.prepare_data import load_tiselac, ecml17_tiselac_data_preparation
-from keras_models.model_zoo import model_rnn, model_mlp_rff, model_mlp
+from utils.model_utils import model_fit_and_save, print_eval, load_model
+from utils.prepare_data import load_tiselac
+from keras_models.model_zoo import model_mlp
 
 __author__ = 'Romain Tavenard romain.tavenard[at]univ-rennes2.fr'
 
@@ -20,15 +20,8 @@ X, X_coord, y = load_tiselac(training_set=True, shuffle=True, random_state=0)
 # RFF stuff
 # =========
 
-n_units_hidden_layers_rff = [256, 128]
-rff_dim = 64
-
-# Load model
-fname_model_rff = "output/models_baseline/mlp_rff.256-128.00184-acc0.9413.weights.hdf5"
-rff_model = model_mlp_rff(input_shape=(sz * d + 2, ), hidden_layers=n_units_hidden_layers_rff, rff_layer_dim=rff_dim)
-rff_model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-rff_model.load_weights(fname_model_rff, by_name=True)
-
+fname_model_rff = "output/models_baseline/mlp_rff.256-128-64.00184-acc0.9413.weights.hdf5"
+rff_model = load_model(fname_model_rff, input_shape=(sz * d + 2, ))
 rff_features = rff_model.predict(numpy.hstack((X, X_coord)))
 
 # =========
@@ -36,23 +29,14 @@ rff_features = rff_model.predict(numpy.hstack((X, X_coord)))
 # =========
 X_rnn = X.reshape((-1, sz, d))
 
-dim_rnn = 256
-n_units_hidden_layers_rnn = [128, 64]
-
 # Load model
-fname_model_rnn = "output/models_baseline/rnn.256.128-64.00062-acc0.9315.weights.hdf5"
-rnn_model = model_rnn(input_shape=(sz, d), hidden_layers=n_units_hidden_layers_rnn, rnn_layer_dim=dim_rnn,
-                      input_shape_side_info=(2, ), use_lstm=True)
-rnn_model.compile(loss="categorical_crossentropy", optimizer="rmsprop", metrics=["accuracy"])
-rnn_model.load_weights(fname_model_rnn, by_name=True)
-
+fname_model_rnn = "output/models_baseline/rnn.256.128-64.00344-acc0.9459.weights.hdf5"
+rnn_model = load_model(fname_model_rnn, input_shape=(sz, d), input_shape_side_info=(2, ))
 rnn_features = rnn_model.predict([X_rnn, X_coord])
 
 # # =========
 # # MLP stuff
 # # =========
-# X_rnn = X.reshape((-1, sz, d))
-#
 # n_units_hidden_layers_mlp = [256, 128, 64]
 #
 # # Load model
