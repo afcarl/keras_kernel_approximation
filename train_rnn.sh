@@ -2,4 +2,4 @@
 
 export PYTHONPATH=`pwd`:${PYTHONPATH}
 python prepare_folders.py
-python xp/train_baseline_rnn.py
+python xp/train_rnn.py

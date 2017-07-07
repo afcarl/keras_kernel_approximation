@@ -33,21 +33,25 @@ def print_eval(model, X, y):
 
 
 def print_train_valid(model, X, y, validation_split):
-    for n_valid in [X.shape[0], int(validation_split * X.shape[0])]:
+    if isinstance(X, list):
+        n = X[0].shape[0]
+    else:
+        n = X.shape[0]
+    for n_valid in [n, int(validation_split * n)]:
         if isinstance(X, list):
             X_valid = [Xi[-n_valid:] for Xi in X]
         else:
             X_valid = X[-n_valid:]
         y_valid = y[-n_valid:]
 
-        if n_valid == X.shape[0]:
+        if n_valid == n:
             print("Full training set")
         else:
             print("Validation set")
         print_eval(model=model, X=X_valid, y=y_valid)
 
 
-def load_model(fname_model, input_shape, input_shape_side_info=None, use_lstm=True, n_classes=None):
+def load_model(fname_model, sz, d, d_side_info=None, use_lstm=True, n_classes=None):
     """Loads a model from its weight filename (all necessary information should be included in it).
 
     As for now, this function assumes that default activation function is used for each layer.
@@ -58,22 +62,23 @@ def load_model(fname_model, input_shape, input_shape_side_info=None, use_lstm=Tr
         # MLP model
         s_layer_sizes = basename.split(".")[1]
         n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
-        model = model_mlp(input_shape=input_shape, hidden_layers=n_units_hidden_layers, n_classes=n_classes)
+        model = model_mlp(input_shape=(sz * d + d_side_info, ), hidden_layers=n_units_hidden_layers,
+                          n_classes=n_classes)
     elif basename.startswith("rnn."):
         # RNN model
         s_rnn_dim, s_layer_sizes = basename.split(".")[1:3]
         dim_rnn = int(s_rnn_dim)
         n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
-        model = model_rnn(input_shape=input_shape, hidden_layers=n_units_hidden_layers, rnn_layer_dim=dim_rnn,
-                          input_shape_side_info=input_shape_side_info, n_classes=n_classes, use_lstm=use_lstm)
+        model = model_rnn(input_shape=(sz, d), hidden_layers=n_units_hidden_layers, rnn_layer_dim=dim_rnn,
+                          input_shape_side_info=(d_side_info, ), n_classes=n_classes, use_lstm=use_lstm)
     elif basename.startswith("mlp_rff."):
         # MLP-RFF model
         s_layer_sizes = basename.split(".")[1]
         n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]
         rff_dim = n_units_hidden_layers[-1]
         n_units_hidden_layers.pop()
-        model = model_mlp_rff(input_shape=input_shape, hidden_layers=n_units_hidden_layers, rff_layer_dim=rff_dim,
-                              n_classes=n_classes)
+        model = model_mlp_rff(input_shape=(sz * d + d_side_info), hidden_layers=n_units_hidden_layers,
+                              rff_layer_dim=rff_dim, n_classes=n_classes)
     else:
         raise ValueError("Cannot interpret file name %s" % basename)
     if model is not None:
