@@ -58,7 +58,7 @@ def load_model(fname_model, sz, d, d_side_info=0, use_lstm=True, n_classes=None)
     """
     path, basename = os.path.split(fname_model)
     model = None
-    if basename.startswith("mlp."):
+    if basename.startswith("mlp.") or basename.startswith("mlp_rnn_rff."):
         # MLP model
         s_layer_sizes = basename.split(".")[1]
         n_units_hidden_layers = [int(s) for s in s_layer_sizes.split("-")]

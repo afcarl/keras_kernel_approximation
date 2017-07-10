@@ -18,9 +18,8 @@ X, X_coord, y = load_tiselac(training_set=True, shuffle=True, random_state=0)
 # Model definition
 
 # fname_model = "output/models_baseline/mlp.256-128-64.00055-0.2315.weights.hdf5"
-# fname_model = "output/models_baseline/mlp_rff.256-128.00184-acc0.9413.weights.hdf5"
-
-fname_model = "output/models_baseline/rnn.256.128-64.00344-acc0.9459.weights.hdf5"
+fname_model = "output/models_baseline/mlp_rff.256-128-64.00184-acc0.9413.weights.hdf5"
+# fname_model = "output/models_baseline/rnn.256.128-64.00344-acc0.9459.weights.hdf5"
 model = load_model(fname_model=fname_model, sz=sz, d=d, d_side_info=X_coord.shape[1], n_classes=n_classes)
 
 if fname_model.split("/")[-1].startswith("rnn."):
