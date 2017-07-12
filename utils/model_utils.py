@@ -21,8 +21,7 @@ def model_fit_and_save(model, basename, X, y, max_iter=10000, validation_split=.
     list_callbacks = [save_model_cb, early_stopping_cb]
     model.fit(X, y, batch_size=128, epochs=max_iter, verbose=2, validation_split=validation_split,
               callbacks=list_callbacks)
-    print("Last saved model: %s" % save_model_cb.last_saved_model)
-    return list_callbacks
+    return save_model_cb.last_saved_model
 
 
 def print_eval(model, X, y):

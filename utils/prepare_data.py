@@ -94,7 +94,7 @@ def ecml17_tiselac_data_preparation(X, d=10, feature_sizes=(8, ), use_time=True,
     return prepared_data
 
 
-def load_tiselac(training_set=True, shuffle=False, random_state=None):
+def load_tiselac(training_set=True, shuffle=False, test_split=None, random_state=None):
     if training_set:
         X = numpy.loadtxt("data_tiselac/training.txt", dtype=numpy.float, delimiter=",")
         X /= X.max()
@@ -104,7 +104,11 @@ def load_tiselac(training_set=True, shuffle=False, random_state=None):
         y = to_categorical(y)
         if shuffle:
             X, X_coord, y = shuffle_data(X, X_coord, y, random_state=random_state)
-        return X, X_coord, y
+        if test_split is None:
+            return X, X_coord, y
+        else:
+            n = int(X.shape[0] * (1. - test_split))
+            return X[:n], X_coord[:n], y[:n], X[n:], X_coord[n:], y[n:]
     else:
         X_train = numpy.loadtxt("data_tiselac/training.txt", dtype=numpy.float, delimiter=",")
         X = numpy.loadtxt("data_tiselac/test.txt", dtype=numpy.float, delimiter=",")
@@ -114,7 +118,11 @@ def load_tiselac(training_set=True, shuffle=False, random_state=None):
         X_coord /= X_train_coord.max(axis=0)
         if shuffle:
             X, X_coord = shuffle_data(X, X_coord, random_state=random_state)
-        return X, X_coord
+        if test_split is None:
+            return X, X_coord
+        else:
+            n = int(X.shape[0] * test_split)
+            return X[:n], X_coord[:n], X[n:], X_coord[n:]
 
 
 def shuffle_data(*args, **kwargs):

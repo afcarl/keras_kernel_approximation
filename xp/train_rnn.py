@@ -13,8 +13,10 @@ dim_rnn = 256
 n_units_hidden_layers = [128, 64]
 
 # Load training data
-X, X_coord, y = load_tiselac(training_set=True, shuffle=True, random_state=0)
+X, X_coord, y, X_test, X_coord_test, y_test = load_tiselac(training_set=True, test_split=.05, shuffle=True,
+                                                           random_state=0)
 X = X.reshape((-1, sz, d))
+X_test = X_test.reshape((-1, sz, d))
 
 # Model definition
 model = model_rnn(input_shape=(sz, d), hidden_layers=n_units_hidden_layers, rnn_layer_dim=dim_rnn,
@@ -30,7 +32,9 @@ basename = "output/models_baseline/rnn.%d." % dim_rnn
 for n_units in n_units_hidden_layers:
     basename += "%d-" % n_units
 basename = basename[:-1]
-model_fit_and_save(model, basename, X=[X, X_coord], y=y, patience_early_stopping=100, save_acc=True)
+fname_weights = model_fit_and_save(model, basename, X=[X, X_coord], y=y, patience_early_stopping=100, save_acc=True,
+                                   validation_split=0.1)
+model.load_weights(fname_weights)
 
 # Go!
-print_eval(model, [X, X_coord], y)
+print_eval(model, [X_test, X_coord_test], y_test)
