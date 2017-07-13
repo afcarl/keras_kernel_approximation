@@ -31,23 +31,41 @@ def print_eval(model, X, y):
     print("F1-score:", f1_score(y_true=y, y_pred=y_pred))
 
 
-def print_train_valid(model, X, y, validation_split):
-    if isinstance(X, list):
-        n = X[0].shape[0]
+def print_train_valid_test(model, X, y, validation_split, test_split=None):
+    n = n_individuals(X)
+    if test_split is None:
+        n_test = 0
     else:
-        n = X.shape[0]
-    for n_valid in [n, int(validation_split * n)]:
-        if isinstance(X, list):
-            X_valid = [Xi[-n_valid:] for Xi in X]
-        else:
-            X_valid = X[-n_valid:]
-        y_valid = y[-n_valid:]
+        n_test = int(n * test_split)
+    n_valid = int((n - n_test) * validation_split)
+    n_train = n - n_test - n_valid
+    print("Training set")
+    print_eval(model=model, X=get_slice(X, 0, n_train), y=y[:n_train])
+    if test_split is not None:
+        print("Validation set")
+        print_eval(model=model, X=get_slice(X, n_train, -n_test), y=y[n_train:-n_test])
+        print("Test set")
+        print_eval(model=model, X=get_slice(X, -n_test), y=y[-n_test:])
+    else:
+        print("Validation set")
+        print_eval(model=model, X=get_slice(X, n_train), y=y[n_train:])
 
-        if n_valid == n:
-            print("Full training set")
+
+def n_individuals(X):
+    if isinstance(X, list):
+        return X[0].shape[0]
+    else:
+        return X.shape[0]
+
+
+def get_slice(X, idx_start, idx_end=None):
+    if isinstance(X, list):
+        return [get_slice(Xi, idx_start, idx_end) for Xi in X]
+    else:
+        if idx_end is None:
+            return X[idx_start:]
         else:
-            print("Validation set")
-        print_eval(model=model, X=X_valid, y=y_valid)
+            return X[idx_start:idx_end]
 
 
 def load_model(fname_model, sz, d, d_side_info=0, use_lstm=True, n_classes=None):
